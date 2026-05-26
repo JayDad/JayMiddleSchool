@@ -43,12 +43,12 @@ export default function ConceptPage({
         / <span className="text-slate-700">{concept.title}</span>
       </nav>
 
-      <header className="mb-6">
+      <header className="mb-5 sm:mb-6">
         <div className="text-xs text-slate-400 mb-1">
           개념 {String(concept.order).padStart(2, "0")}
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold">{concept.title}</h1>
-        <p className="text-slate-600 mt-2 text-lg">{concept.summary}</p>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{concept.title}</h1>
+        <p className="text-slate-600 mt-2 text-base sm:text-lg">{concept.summary}</p>
       </header>
 
       <KeyPoints points={concept.keyPoints} />
@@ -59,7 +59,7 @@ export default function ConceptPage({
 
       <SelfCheck quiz={concept.quiz} />
 
-      <nav className="mt-12 grid sm:grid-cols-2 gap-3">
+      <nav className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 gap-3">
         {prev ? (
           <Link
             href={`/science/${unit.slug}/${prev.slug}`}

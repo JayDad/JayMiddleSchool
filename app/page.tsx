@@ -4,11 +4,11 @@ import { SUBJECTS } from "@/lib/catalog";
 export default function HomePage() {
   return (
     <div>
-      <section className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+      <section className="mb-8 sm:mb-10">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
           개념은 시각화로, 시험은 포인트로.
         </h1>
-        <p className="mt-3 text-slate-600 text-lg">
+        <p className="mt-3 text-slate-600 text-base sm:text-lg">
           중학교 과목의 핵심 개념을 그림으로 이해하고, 시험에 나오는 포인트까지
           한 페이지에서 정리합니다.
         </p>
@@ -16,7 +16,7 @@ export default function HomePage() {
 
       <section>
         <h2 className="text-xl font-bold mb-4">과목</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {SUBJECTS.map((s) => {
             const card = (
               <div

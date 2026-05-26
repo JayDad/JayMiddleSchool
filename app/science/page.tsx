@@ -4,16 +4,16 @@ import { SCIENCE_UNITS } from "@/lib/catalog";
 export default function SciencePage() {
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <p className="text-sm text-slate-500">과목</p>
-        <h1 className="text-3xl font-bold mt-1">과학</h1>
-        <p className="text-slate-600 mt-2">
+        <h1 className="text-2xl sm:text-3xl font-bold mt-1">과학</h1>
+        <p className="text-slate-600 mt-2 text-[15px] sm:text-base">
           중학교 과학 단원을 학년·주제별로 모았습니다. 각 단원에는 시각화된 개념과
           시험 출제 포인트가 들어 있습니다.
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {SCIENCE_UNITS.map((unit) => (
           <Link
             key={unit.slug}

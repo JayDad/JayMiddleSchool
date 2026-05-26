@@ -29,7 +29,7 @@ export default function SelfCheck({ quiz }: { quiz: QuizItem[] }) {
                   const isUserChoice = userChoice === ci;
                   const isCorrect = item.answer === ci;
                   let cls =
-                    "w-full text-left px-3 py-2 rounded-lg border transition";
+                    "w-full text-left px-3 py-3 sm:py-2 rounded-lg border transition text-[15px] sm:text-base min-h-[44px]";
                   if (isRevealed) {
                     if (isCorrect) {
                       cls += " border-emerald-500 bg-emerald-50 text-emerald-900";
@@ -67,7 +67,7 @@ export default function SelfCheck({ quiz }: { quiz: QuizItem[] }) {
                       setRevealed((r) => ({ ...r, [qi]: true }))
                     }
                     disabled={userChoice === undefined}
-                    className="text-sm px-3 py-1.5 rounded-lg bg-brand-600 text-white disabled:bg-slate-300"
+                    className="text-sm px-4 py-2 rounded-lg bg-brand-600 text-white disabled:bg-slate-300 min-h-[40px]"
                   >
                     정답 확인
                   </button>
@@ -81,7 +81,7 @@ export default function SelfCheck({ quiz }: { quiz: QuizItem[] }) {
                         return n;
                       });
                     }}
-                    className="text-sm px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600"
+                    className="text-sm px-4 py-2 rounded-lg border border-slate-300 text-slate-600 min-h-[40px]"
                   >
                     다시 풀기
                   </button>

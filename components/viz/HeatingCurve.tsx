@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Substance = {
   name: string;
@@ -43,6 +43,10 @@ export default function HeatingCurve({
 }) {
   const [key, setKey] = useState<keyof typeof SUBSTANCES>(substance);
   const [amount, setAmount] = useState<"small" | "large">("small");
+  const [progress, setProgress] = useState(1); // 0..1 along curve
+  const [playing, setPlaying] = useState(false);
+  const rafRef = useRef<number | null>(null);
+  const lastRef = useRef<number>(0);
   const s = SUBSTANCES[key];
 
   const { yMin, yMax } = useMemo(() => {
@@ -73,7 +77,69 @@ export default function HeatingCurve({
     .map(([t, T], i) => `${i === 0 ? "M" : "L"} ${x(t)} ${y(T)}`)
     .join(" ");
 
+  // total path length (in graph units) for progress mapping
+  const segLens = points.slice(1).map((p, i) => {
+    const a = points[i];
+    const dx = x(p[0]) - x(a[0]);
+    const dy = y(p[1]) - y(a[1]);
+    return Math.hypot(dx, dy);
+  });
+  const totalLen = segLens.reduce((a, b) => a + b, 0);
+
+  // current point along the curve based on progress
+  const currentPoint = useMemo(() => {
+    const target = totalLen * progress;
+    let acc = 0;
+    for (let i = 0; i < segLens.length; i++) {
+      if (acc + segLens[i] >= target) {
+        const r = segLens[i] === 0 ? 0 : (target - acc) / segLens[i];
+        const a = points[i];
+        const b = points[i + 1];
+        return {
+          x: x(a[0]) + (x(b[0]) - x(a[0])) * r,
+          y: y(a[1]) + (y(b[1]) - y(a[1])) * r,
+          T: a[1] + (b[1] - a[1]) * r,
+        };
+      }
+      acc += segLens[i];
+    }
+    const last = points[points.length - 1];
+    return { x: x(last[0]), y: y(last[1]), T: last[1] };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress, key, amount]);
+
+  // play animation
+  useEffect(() => {
+    if (!playing) return;
+    lastRef.current = performance.now();
+    const tick = (now: number) => {
+      const dt = (now - lastRef.current) / 1000;
+      lastRef.current = now;
+      setProgress((p) => {
+        const next = p + dt / 6; // 6s full sweep
+        if (next >= 1) {
+          setPlaying(false);
+          return 1;
+        }
+        return next;
+      });
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [playing]);
+
+  // reset progress when substance/amount changes
+  useEffect(() => {
+    setProgress(1);
+    setPlaying(false);
+  }, [key, amount]);
+
   const yTicks = niceTicks(yMin, yMax, 5);
+  const dashLen = totalLen;
+  const dashOffset = totalLen * (1 - progress);
 
   return (
     <div className="my-6 rounded-xl border border-slate-200 bg-white p-4">
@@ -120,6 +186,7 @@ export default function HeatingCurve({
         )}
       </div>
 
+      <div className="viz-scroll">
       <svg
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
         className="w-full h-auto"
@@ -204,7 +271,17 @@ export default function HeatingCurve({
           녹는점 {s.meltingPoint}℃
         </text>
 
-        {/* curve */}
+        {/* full curve faint background */}
+        <path
+          d={path}
+          fill="none"
+          stroke={s.color}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity={0.18}
+        />
+        {/* curve — animated draw via dash offset */}
         <path
           d={path}
           fill="none"
@@ -212,7 +289,35 @@ export default function HeatingCurve({
           strokeWidth={2.5}
           strokeLinecap="round"
           strokeLinejoin="round"
+          strokeDasharray={dashLen}
+          strokeDashoffset={dashOffset}
+          style={{ transition: playing ? "none" : "stroke-dashoffset 0.25s linear" }}
         />
+        {/* current state marker */}
+        <g
+          style={{
+            transition: playing ? "none" : "transform 0.25s linear",
+            transform: "translateZ(0)",
+          }}
+        >
+          <circle
+            cx={currentPoint.x}
+            cy={currentPoint.y}
+            r={6}
+            fill="white"
+            stroke={s.color}
+            strokeWidth={2.5}
+          />
+          <text
+            x={currentPoint.x + 10}
+            y={currentPoint.y - 8}
+            fontSize="11"
+            fontWeight="600"
+            fill="#0f172a"
+          >
+            {currentPoint.T.toFixed(0)}℃
+          </text>
+        </g>
 
         {/* labels */}
         <text
@@ -234,7 +339,31 @@ export default function HeatingCurve({
           시간 →
         </text>
       </svg>
+      </div>
 
+      <div className="flex items-center gap-3 mt-3">
+        <button
+          onClick={() => {
+            if (progress >= 1) setProgress(0);
+            setPlaying((p) => !p);
+          }}
+          className="text-sm px-3 py-1.5 rounded-lg bg-brand-600 text-white min-w-[72px]"
+        >
+          {playing ? "일시정지" : progress >= 1 ? "▶ 다시" : "▶ 재생"}
+        </button>
+        <input
+          type="range"
+          min={0}
+          max={1000}
+          value={Math.round(progress * 1000)}
+          onChange={(e) => {
+            setPlaying(false);
+            setProgress(Number(e.target.value) / 1000);
+          }}
+          className="flex-1 accent-brand-600"
+          aria-label="가열 진행도"
+        />
+      </div>
       <p className="text-xs text-slate-500 mt-2">
         {amount === "small" ? "양을 적게" : "양을 많이"} 했을 때 — 끓는점·녹는점
         온도는 그대로, <strong>수평구간의 길이만</strong> 길어집니다.

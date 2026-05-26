@@ -138,24 +138,76 @@ import HeatingCurve from "@/components/viz/HeatingCurve";
 
 ## 8. 로드맵
 
-### Sprint 1 (지금, 프로토타입)
+### Sprint 1 (완료, 프로토타입)
 - [x] 프로젝트 셋업 (Next.js + Tailwind + MDX)
 - [x] 라우팅 + 레이아웃 기본 컴포넌트
 - [x] 중2 “물질의 특성” 단원 메타 + 개념 3개 (끓는점/밀도/용해도) 시각화 포함
 - [x] 자가 점검 퀴즈 컴포넌트
 
-### Sprint 2 (콘텐츠 확장)
-- [ ] 물질의 특성 단원 전체 (혼합물 분리 포함)
+### Sprint 1.5 (완료, 2026-05) — 배포 & 모바일 & 동적 인포그래픽
+- [x] Vercel CLI 설치, 로그인(`kimdooyong-7717`), 프로젝트 link(`dooyongkims-projects/jaymiddleschool`), GitHub repo(`jaydad/jaymiddleschool`) 연결
+- [x] 의존성 보안 업그레이드: `next ^14.2.33`, `next-mdx-remote ^6.0.0` (Vercel 보안 게이트 통과 목적)
+- [x] **모바일 최적화**
+  - `app/layout.tsx`: `viewport` export, 헤더 sticky, 패딩 `px-4 sm:px-5`, 로고/제목 사이즈 반응형
+  - `app/globals.css`: `-webkit-text-size-adjust`, MDX prose 폰트 모바일 사이즈, `.viz-scroll` 유틸 (좁은 화면에서 SVG 가로 스크롤, `min-w-[420px]`)
+  - 홈/과학/단원/개념 페이지 제목 `text-2xl sm:text-3xl md:text-4xl`, 그리드 `grid-cols-1 sm:grid-cols-2`
+  - `SelfCheck.tsx`: 보기 버튼 `min-h-[44px]` (터치 영역 보장)
+- [x] **동적 인포그래픽**
+  - `DensityTank`: 물체 선택 시 위에서 떨어져 부력 위치에 멈추는 애니메이션 + 잔물결 (SMIL `<animate>`)
+  - `HeatingCurve`: ▶ 재생 버튼으로 6초 가열 시뮬레이션 (RAF 기반), 곡선 그려지는 stroke-dashoffset 애니메이션, 진행 슬라이더로 수동 스크럽, 현재 온도 점 추적
+  - `SolubilityCurve`: 지시점 맥동(pulse), 진행률 바, 우측 미니 비커에 용액/안 녹은 결정 결정
+- [ ] (대기) `vercel --prod --yes` 재실행 후 배포 확정
+
+### Sprint 2 (진행 중) — "물질의 특성" 단원 완성 + 네비게이션
+- [x] **녹는점 (melting-point)** — `HeatingCurve` 재사용, MDX 추가 (order 2). density/solubility를 한 칸씩 밀어 끓는점→녹는점→밀도→용해도 순으로 정렬
+- [x] **`SolubilityCurve` 미니 비커 버그 수정** — 슬라이더(용질 양)에 따라 수위가 변하던 문제. 물 100g은 고정 수위로 유지하고, 슬라이더는 (a) 용액 색의 진하기(농도) (b) 바닥 결정 개수 만 변화시키도록 변경. "물 100 g" 라벨 추가
+- [x] **좌상단 햄버거 메뉴 + 사이트 트리 드로어** (`components/SiteMenu.tsx`)
+  - `app/layout.tsx`에서 서버 사이드로 `MenuTree` 생성 (SUBJECTS × Units × Concepts)
+  - 클라이언트 드로어: 좌측 슬라이드, 배경/ESC/X로 닫힘, 라우트 변경 시 자동 닫힘, body 스크롤 잠금
+  - 트리 구조: 홈 / 과목(준비중 비활성) → 단원(학년 배지) → 개념. 현재 경로 자동 펼침 + brand 색 하이라이트
+- [x] **순물질 vs 혼합물** — `PureMixtureViz`(분자 모델) + `PureMixtureCurve`(가열곡선 비교). MDX order 0
+- [x] **증류** — `DistillationApparatus`(장치 애니메이션, 온도계/냉각관/받는 그릇/방울 떨어짐) + `DistillationCurve`(에탄올-물 두 끓는점 수평구간)
+- [x] **재결정** — `RecrystallizationViz`(가열→냉각→결정 석출→거름 3단계) + 기존 `SolubilityCurve` 재사용
+- [x] **거름** — `FiltrationFunnel`(모래+물 vs 설탕물 비교, 거름종이 통과 여부)
+- [x] **크로마토그래피** — `ChromatographyViz`(잉크 시료 선택, 색소 분리 애니메이션)
+- [x] **밀도 보강** — `MassVolumeGraph`(질량-부피 직선, 기울기=밀도 시각화)
 - [ ] 단원 진행도(localStorage)
 - [ ] 검색
+- [ ] MDX 표는 JSX `<table>`로 작성. (또는 `remark-gfm` 도입 시 마크다운 표 사용 가능)
 
-### Sprint 3 (다음 단원)
-- [ ] 중2 전기와 자기
+### Sprint 3 (진행 중) — "열과 우리 생활" 단원 (중2)
+- [x] 단원 메타 등록 (`heat-and-life`, `lib/catalog.ts`)
+- [x] **온도와 열 (temperature-and-heat)** — `ParticleMotion` viz (두 박스 입자 운동, 온도 슬라이더, 맞대기로 열평형 시뮬레이션)
+- [x] **열의 이동 (heat-transfer)** — `HeatTransferModes` viz (전도/대류/복사 3종 토글 애니메이션)
+- [ ] **비열 (specific-heat)** — `SpecificHeatRace` viz (같은 질량 두 물질 동시 가열, 온도 상승 속도 비교)
+- [ ] **열팽창 (thermal-expansion)** — `BimetalStrip` viz (바이메탈 휨 애니메이션)
+
+### Sprint 4 (다음 단원 후보)
+- [ ] 중2 전기와 자기 (`Circuit`, `MagneticField`)
+- [ ] 중2 태양계 (`OrbitSimulator`)
 - [ ] 중2 식물/동물과 에너지
 
 ### Sprint 4+ (확장)
 - [ ] 중1, 중3 과학
 - [ ] 사회/역사 도입 (Timeline, Map 컴포넌트 추가)
+
+---
+
+## 현재 컨텐츠 인벤토리 (2026-05-26)
+
+| 단원 | 개념 | order | 시각화 컴포넌트 |
+|---|---|---|---|
+| 물질의 특성 | 순물질과 혼합물 | 0 | PureMixtureViz, PureMixtureCurve |
+| 물질의 특성 | 끓는점 | 1 | HeatingCurve |
+| 물질의 특성 | 녹는점 | 2 | HeatingCurve |
+| 물질의 특성 | 밀도 | 3 | DensityTank, MassVolumeGraph |
+| 물질의 특성 | 용해도 | 4 | SolubilityCurve |
+| 물질의 특성 | 증류 | 5 | DistillationApparatus, DistillationCurve |
+| 물질의 특성 | 재결정 | 6 | RecrystallizationViz, SolubilityCurve |
+| 물질의 특성 | 거름 | 7 | FiltrationFunnel |
+| 물질의 특성 | 크로마토그래피 | 8 | ChromatographyViz |
+| 열과 우리 생활 | 온도와 열 | 1 | ParticleMotion |
+| 열과 우리 생활 | 열의 이동 | 2 | HeatTransferModes |
 
 ---
 
@@ -172,3 +224,78 @@ import HeatingCurve from "@/components/viz/HeatingCurve";
 - **콘텐츠 정확성**: 교과서/공식 자료 교차 검증 필수. 출처 표기 필드 추가 검토.
 - **시각화 비용**: 개념마다 인터랙티브 컴포넌트는 비쌈 → 정적 SVG로 충분한 경우 정적 우선.
 - **저작권**: 교과서 그림 직접 사용 금지. 모든 시각화 자체 제작.
+
+---
+
+## 11. 현재 빌드/배포 검증 상태 (2026-05-26 기준)
+
+### 로컬 검증 — **여전히 차단**
+- Google Drive 동기화 폴더(`G:\내 드라이브\...`) 위에서 `npm install`이 `EBADF` / `EPERM` 으로 실패.
+- 원인: Google Drive 파일 잠금이 node_modules 대량 쓰기와 충돌.
+- 향후 권장: Google Drive 외부 폴더(`C:\dev\` 등)에 클론해 로컬 dev 환경 마련.
+
+### 원격 검증 — **통과 (사용자 확인)**
+- 2026-05-26: 사용자가 `vercel --prod --yes`를 직접 실행 → **배포 성공 ("잘되네" 확인)**.
+- 이 시점까지의 모든 변경물이 Vercel 원격 빌드를 통과:
+  - 의존성 업그레이드 (`next ^14.2.33`, `next-mdx-remote ^6.0.0`) 보안 게이트 통과
+  - 신규 컴포넌트: `SiteMenu`, `ParticleMotion`, `HeatTransferModes`
+  - 변경 컴포넌트: `DensityTank`/`HeatingCurve`/`SolubilityCurve` 애니메이션
+  - 신규 MDX: `melting-point`, `temperature-and-heat`, `heat-transfer`
+  - 카탈로그: `heat-and-life` 단원 추가
+  - 모바일 최적화 (`viewport`, prose, `.viz-scroll`)
+
+### 남은 미검증 항목 (정적 분석 / 사용자 수동 확인 필요)
+- [ ] 브라우저에서 실제 렌더 동작 확인 — (a) 햄버거 메뉴 (b) ParticleMotion 입자 운동·열평형 (c) HeatTransferModes 3종 토글 (d) SMIL `<animate>` 크로스 브라우저
+- [ ] RAF 루프 strict-mode 더블 마운트 / cleanup / stale closure
+- [ ] MDX 내 JSX `<table className=...>` 렌더 결과 (next-mdx-remote@6 RSC)
+- [ ] 모바일 디바이스 실기기 확인
+
+### 다음 권장 액션
+1. 배포 URL 직접 열어 핵심 동작 빠르게 확인 (위 체크리스트)
+2. 정적 코드 리뷰 (superpowers `requesting-code-review`) — 빌드는 통과해도 잡힐 수 있는 버그 찾기
+3. 비열·열팽창 viz 작성으로 "열과 우리 생활" 단원 완성
+
+### 정직 선언 업데이트
+> 빌드·배포는 사용자 확인으로 통과. 단 **실제 인터랙션 동작**(RAF 루프·SMIL·드로어 등)은 브라우저 수동 확인 또는 e2e 테스트 전까지는 "동작 확인됨"이라 단정하지 않음.
+
+---
+
+## 12. 코드 리뷰 결과 (2026-05-26, superpowers `requesting-code-review`)
+
+빌드는 통과했지만 런타임/사용성 측면에서 잡힌 항목들. **다음 코드 추가 전에 (b) 3건은 먼저 처리하는 것이 좋음.**
+
+### 🔴 즉시 수정 권장 (Must-fix before more code) — **모두 완료 2026-05-26**
+
+1. ✅ **`components/viz/ParticleMotion.tsx` — RAF 루프 재구독 / stale closure** 수정 완료
+   - tempA/tempB/contact를 `useRef`로 mirror, effect deps `[]`로 단일 RAF 루프 유지
+   - 열평형 종료 조건은 두 값 차이가 0.2℃ 이하일 때 setState 중단
+
+2. ✅ **`components/viz/DensityTank.tsx` — 가벼운 물체 위치 버그** 수정 완료
+   - `HEADROOM = 44` 도입 → 액체 위에 공기 공간 확보, 코르크가 탱크 안에 표시됨
+   - `findRestY` 로직: 단순 top-down 순회, 처음 만나는 더 무거운 액체 위에서 정지
+   - 부력 판정 `>=` → `>` 로 수정 (얼음 0.92가 같은 밀도 기름 위가 아니라 물 위에 뜨도록)
+
+3. ✅ **`app/layout.tsx` — `buildMenuTree`를 React `cache()`로 래핑** 완료
+   - `import { cache } from "react"` 추가, 함수를 `cache(() => ...)` 형태로 감쌈
+
+### 🟡 차후 처리 OK (Defer-OK)
+
+- `SiteMenu` — 키보드 포커스 트랩/복귀 없음, iOS Safari 바디 스크롤 잠금 불완전
+- `HeatTransferModes` — `<defs>`(화살표) 위치 정리
+- `HeatingCurve` — `eslint-disable` 제거하고 deps 정리
+- `SolubilityCurve` — `<text>` x/y CSS 트랜지션은 Safari 무시 (장식)
+- `niceTicks` — 수은(녹는점 -39℃) 그래프에서 음수 영역 눈금이 빠짐
+
+### 🟢 안전 확인된 항목
+
+- MDX 표 `<table className="...">` — next-mdx-remote@6 호환 OK
+- YAML frontmatter — 신규 3개 파일 모두 깨끗 (특수문자 따옴표 처리 OK)
+- 자가점검 보기 버튼 터치 영역(44px) — iOS 가이드라인 충족
+- TypeScript — `as any` 없음, `eslint-disable`은 위 1건만
+
+### 전체 평가
+> "학생 사용자 입장에서 보면 잘 돌아가 보이는 빌드. 단 viz 레이어가 약점이고, RAF + 상태 상호작용(`ParticleMotion`)과 `DensityTank.findRestY`의 경계 조건이 가장 위험. `SiteMenu`의 a11y/iOS 갭은 실제 문제지만 치명적이지는 않음." — reviewer subagent
+
+### 후속 조치 상태
+- 🔴 must-fix 3건 — **완료 (2026-05-26)**. 단 코드 변경 후 빌드 재검증은 아직 수행하지 않음. 다음 `vercel` 또는 `/goal` 실행 시 자동으로 검증됨.
+- 🟡 defer-OK 항목 (SiteMenu 포커스 트랩·iOS scroll lock, HeatTransferModes defs 정리, HeatingCurve eslint-disable, SolubilityCurve `<text>` transition, niceTicks 음수 범위) — 미처리. 추후 별도 그루밍 권장.

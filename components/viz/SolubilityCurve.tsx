@@ -92,6 +92,7 @@ export default function SolubilityCurve() {
         ))}
       </div>
 
+      <div className="viz-scroll">
       <svg
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
         className="w-full h-auto"
@@ -181,16 +182,26 @@ export default function SolubilityCurve() {
         <circle
           cx={x(temp)}
           cy={y(currentSol)}
-          r={5}
+          r={6}
           fill={active.color}
           stroke="white"
-          strokeWidth={2}
-        />
+          strokeWidth={2.5}
+          style={{ transition: "cx 0.15s linear, cy 0.15s linear" }}
+        >
+          <animate
+            attributeName="r"
+            values="6;9;6"
+            dur="1.6s"
+            repeatCount="indefinite"
+          />
+        </circle>
         <text
-          x={x(temp) + 8}
-          y={y(currentSol) - 8}
-          fontSize="11"
+          x={x(temp) + 10}
+          y={y(currentSol) - 10}
+          fontSize="12"
+          fontWeight="600"
           fill="#0f172a"
+          style={{ transition: "x 0.15s linear, y 0.15s linear" }}
         >
           {currentSol.toFixed(1)} g
         </text>
@@ -215,8 +226,9 @@ export default function SolubilityCurve() {
           온도 (℃)
         </text>
       </svg>
+      </div>
 
-      <div className="grid md:grid-cols-2 gap-4 mt-4">
+      <div className="grid sm:grid-cols-2 gap-4 mt-4">
         <label className="block">
           <div className="flex justify-between text-sm text-slate-600">
             <span>온도</span>
@@ -247,28 +259,121 @@ export default function SolubilityCurve() {
         </label>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-3 text-center text-sm">
-        <div className="rounded-lg bg-emerald-50 p-2">
-          <div className="text-xs text-emerald-700">녹는 양</div>
-          <div className="font-bold text-emerald-800">
-            {dissolved.toFixed(1)} g
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-[1fr,auto] gap-3 items-stretch">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center text-xs sm:text-sm">
+          <div className="rounded-lg bg-emerald-50 p-2 transition-colors">
+            <div className="text-xs text-emerald-700">녹는 양</div>
+            <div
+              className="font-bold text-emerald-800 tabular-nums"
+              style={{ transition: "color 0.2s" }}
+            >
+              {dissolved.toFixed(1)} g
+            </div>
+            <div className="mt-1 h-1.5 rounded bg-emerald-100 overflow-hidden">
+              <div
+                className="h-full bg-emerald-500"
+                style={{
+                  width: `${Math.min(100, (dissolved / Math.max(mass, 1)) * 100)}%`,
+                  transition: "width 0.2s linear",
+                }}
+              />
+            </div>
+          </div>
+          <div className="rounded-lg bg-amber-50 p-2 transition-colors">
+            <div className="text-xs text-amber-700">안 녹고 남는 양</div>
+            <div className="font-bold text-amber-800 tabular-nums">
+              {undissolved.toFixed(1)} g
+            </div>
+            <div className="mt-1 h-1.5 rounded bg-amber-100 overflow-hidden">
+              <div
+                className="h-full bg-amber-500"
+                style={{
+                  width: `${Math.min(100, (undissolved / Math.max(mass, 1)) * 100)}%`,
+                  transition: "width 0.2s linear",
+                }}
+              />
+            </div>
+          </div>
+          <div
+            className={`rounded-lg p-2 transition-colors ${
+              undissolved > 0
+                ? "bg-amber-100"
+                : dissolved === currentSol
+                  ? "bg-blue-50"
+                  : "bg-slate-100"
+            }`}
+          >
+            <div className="text-xs text-slate-600">상태</div>
+            <div className="font-bold text-slate-800">
+              {undissolved > 0
+                ? "포화 + 남음"
+                : dissolved === currentSol
+                  ? "포화"
+                  : "불포화"}
+            </div>
           </div>
         </div>
-        <div className="rounded-lg bg-amber-50 p-2">
-          <div className="text-xs text-amber-700">안 녹고 남는 양</div>
-          <div className="font-bold text-amber-800">
-            {undissolved.toFixed(1)} g
-          </div>
-        </div>
-        <div className="rounded-lg bg-slate-100 p-2">
-          <div className="text-xs text-slate-600">상태</div>
-          <div className="font-bold text-slate-800">
-            {undissolved > 0
-              ? "포화 + 남음"
-              : dissolved === currentSol
-                ? "포화"
-                : "불포화"}
-          </div>
+
+        {/* mini beaker — water level fixed (100 g), solution color deepens
+            with dissolved concentration, undissolved solute settles as crystals. */}
+        <div className="flex flex-col items-center sm:items-end">
+          <svg viewBox="0 0 80 100" className="w-16 h-20" aria-label="비커 시각화">
+            {/* beaker outline */}
+            <path
+              d="M10 15 L10 90 Q10 95 15 95 L65 95 Q70 95 70 90 L70 15"
+              fill="none"
+              stroke="#94a3b8"
+              strokeWidth={2}
+            />
+            {/* fixed water level (100 g) */}
+            <rect
+              x={11}
+              y={35}
+              width={58}
+              height={60}
+              fill={active.color}
+              opacity={Math.min(0.7, 0.1 + (dissolved / currentSol) * 0.55)}
+              style={{ transition: "opacity 0.2s" }}
+            />
+            {/* water surface line */}
+            <line x1={11} y1={35} x2={69} y2={35} stroke="#94a3b8" strokeWidth={1} />
+            {/* undissolved crystals — pile grows upward with amount */}
+            {undissolved > 0 && (() => {
+              const COLS = 10;             // crystals per row
+              const COL_W = 5.4;           // horizontal spacing
+              const ROW_H = 3.6;           // vertical spacing
+              const R = 1.6;
+              const X0 = 14;               // left edge of pile
+              const FLOOR_Y = 93;          // bottom row center
+              const SURFACE_Y = 36;        // water surface (cap rows here)
+              const maxRows = Math.floor((FLOOR_Y - SURFACE_Y) / ROW_H);
+              // Scale: 1 crystal per ~2 g of undissolved solute (visual)
+              const count = Math.min(
+                COLS * maxRows,
+                Math.ceil(undissolved / 2),
+              );
+              return (
+                <g>
+                  {Array.from({ length: count }).map((_, i) => {
+                    const row = Math.floor(i / COLS);
+                    const col = i % COLS;
+                    // alternate odd rows half-step for a pile look
+                    const offset = row % 2 === 0 ? 0 : COL_W / 2;
+                    return (
+                      <circle
+                        key={i}
+                        cx={X0 + col * COL_W + offset}
+                        cy={FLOOR_Y - row * ROW_H}
+                        r={R}
+                        fill={active.color}
+                      />
+                    );
+                  })}
+                </g>
+              );
+            })()}
+          </svg>
+          <div className="text-[10px] text-slate-500 mt-1">물 100 g</div>
         </div>
       </div>
     </div>

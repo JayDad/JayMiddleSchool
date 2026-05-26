@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Item = {
   name: string;
@@ -25,33 +25,43 @@ const OBJECTS: Item[] = [
 const TANK_W = 320;
 const TANK_H = 280;
 const TANK_PAD = 20;
+// headroom (air) above the liquid stack so a floating object stays inside the tank
+const HEADROOM = 44;
 
 export default function DensityTank() {
   const [selected, setSelected] = useState<string>("얼음");
   const obj = OBJECTS.find((o) => o.name === selected)!;
+  const [animKey, setAnimKey] = useState(0);
+  const prevKey = useRef(selected);
+
+  useEffect(() => {
+    if (prevKey.current !== selected) {
+      prevKey.current = selected;
+      setAnimKey((k) => k + 1);
+    }
+  }, [selected]);
 
   // Stack liquids by density (lighter on top)
   const sorted = [...LIQUIDS].sort((a, b) => a.density - b.density);
-  const layerH = (TANK_H - TANK_PAD * 2) / sorted.length;
+  const liquidsTop = TANK_PAD + HEADROOM;
+  const liquidsBottom = TANK_H - TANK_PAD;
+  const layerH = (liquidsBottom - liquidsTop) / sorted.length;
 
-  // Find where object floats: at boundary between layer with density < obj and layer with density >= obj
+  // Find where object floats: at the boundary between the lightest liquid
+  // that is still denser than the object (floats on it) and any lighter liquid
+  // above it. If the object is lighter than *every* liquid, it rests on the
+  // surface of the topmost (lightest) liquid.
   const findRestY = () => {
-    // bottom of tank
-    let floor = TANK_H - TANK_PAD;
-    for (let i = sorted.length - 1; i >= 0; i--) {
-      const liq = sorted[i];
-      const liqTopY = TANK_PAD + i * layerH;
-      const liqBotY = liqTopY + layerH;
-      if (liq.density >= obj.density) {
+    // sorted is light → dense (index 0 is lightest, top of liquid stack)
+    // iterate top-down; first liquid denser than the object is where it floats
+    for (let i = 0; i < sorted.length; i++) {
+      if (sorted[i].density > obj.density) {
         // object floats on top of this liquid
-        floor = liqTopY;
-      } else {
-        // object sinks through this lighter liquid
-        floor = liqBotY;
-        return floor;
+        return liquidsTop + i * layerH;
       }
     }
-    return floor;
+    // denser than every liquid → sinks to the bottom of the tank
+    return liquidsBottom;
   };
 
   const restY = findRestY();
@@ -79,7 +89,7 @@ export default function DensityTank() {
 
           {/* liquid layers */}
           {sorted.map((liq, i) => {
-            const yTop = TANK_PAD + i * layerH;
+            const yTop = liquidsTop + i * layerH;
             return (
               <g key={liq.name}>
                 <rect
@@ -103,24 +113,73 @@ export default function DensityTank() {
             );
           })}
 
-          {/* object */}
-          <circle
-            cx={TANK_W / 2}
-            cy={restY - ballR}
-            r={ballR}
-            fill={obj.color}
-            stroke="#0f172a"
-            strokeWidth={1.5}
-          />
-          <text
-            x={TANK_W / 2}
-            y={restY - ballR - 22}
-            textAnchor="middle"
-            fontSize="11"
-            fill="#0f172a"
-          >
-            {obj.name} ({obj.density} g/cm³)
-          </text>
+          {/* object — animated drop from above into rest position */}
+          <g key={animKey}>
+            <circle
+              cx={TANK_W / 2}
+              cy={restY - ballR}
+              r={ballR}
+              fill={obj.color}
+              stroke="#0f172a"
+              strokeWidth={1.5}
+            >
+              <animate
+                attributeName="cy"
+                from={TANK_PAD - ballR - 4}
+                to={restY - ballR}
+                dur="1.2s"
+                begin="0s"
+                fill="freeze"
+                calcMode="spline"
+                keySplines="0.25 0.1 0.25 1"
+              />
+            </circle>
+            {/* ripple at rest */}
+            <circle
+              cx={TANK_W / 2}
+              cy={restY}
+              r={ballR}
+              fill="none"
+              stroke={obj.color}
+              strokeWidth={2}
+              opacity={0}
+            >
+              <animate
+                attributeName="r"
+                from={ballR}
+                to={ballR * 2.4}
+                dur="0.7s"
+                begin="1.0s"
+                fill="freeze"
+              />
+              <animate
+                attributeName="opacity"
+                values="0;0.6;0"
+                dur="0.7s"
+                begin="1.0s"
+                fill="freeze"
+              />
+            </circle>
+            <text
+              x={TANK_W / 2}
+              y={restY - ballR - 22}
+              textAnchor="middle"
+              fontSize="11"
+              fill="#0f172a"
+            >
+              <animate
+                attributeName="y"
+                from={TANK_PAD - ballR - 26}
+                to={restY - ballR - 22}
+                dur="1.2s"
+                begin="0s"
+                fill="freeze"
+                calcMode="spline"
+                keySplines="0.25 0.1 0.25 1"
+              />
+              {obj.name} ({obj.density} g/cm³)
+            </text>
+          </g>
         </svg>
 
         <div>

@@ -1,7 +1,7 @@
 ---
 title: 밀도
 slug: density
-order: 2
+order: 3
 summary: 단위 부피당 질량. 물질의 특성이며 같은 물질에서는 양과 무관하다.
 keyPoints:
   - "밀도 = **질량 ÷ 부피** (단위 g/cm³, g/mL)"
@@ -47,6 +47,7 @@ quiz:
 ---
 
 import DensityTank from "@/components/viz/DensityTank";
+import MassVolumeGraph from "@/components/viz/MassVolumeGraph";
 
 ## 정의
 
@@ -56,6 +57,17 @@ import DensityTank from "@/components/viz/DensityTank";
 
 “얼마나 빽빽한가”를 나타내는 값이다. 같은 부피라도 무거운 물질이면 밀도가 크다.
 밀도는 양과 무관한 **물질의 특성**이다.
+
+## 질량-부피 그래프 — 직선의 기울기 = 밀도
+
+같은 물질을 양만 다르게 측정해서 질량과 부피를 그래프로 그리면 **원점을 지나는
+직선**이 된다. 그리고 그 **직선의 기울기가 곧 밀도**다.
+
+<MassVolumeGraph />
+
+- **기울기가 가파를수록** 같은 부피에 더 많은 질량 → **밀도 큰 물질**
+- 같은 물질의 다른 양은 같은 직선 위에 위치 (양과 무관)
+- 시험 단골: 그래프에서 "어떤 물질의 밀도가 가장 큰가?" → 가장 가파른 직선
 
 ## 뜨고 가라앉음 — 직접 해보자
 
