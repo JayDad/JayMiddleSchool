@@ -175,25 +175,40 @@ import HeatingCurve from "@/components/viz/HeatingCurve";
 - [ ] 검색
 - [ ] MDX 표는 JSX `<table>`로 작성. (또는 `remark-gfm` 도입 시 마크다운 표 사용 가능)
 
-### Sprint 3 (진행 중) — "열과 우리 생활" 단원 (중2)
+### Sprint 3 (완료, 2026-05-26) — "열과 우리 생활" 단원 (중2)
 - [x] 단원 메타 등록 (`heat-and-life`, `lib/catalog.ts`)
 - [x] **온도와 열 (temperature-and-heat)** — `ParticleMotion` viz (두 박스 입자 운동, 온도 슬라이더, 맞대기로 열평형 시뮬레이션)
 - [x] **열의 이동 (heat-transfer)** — `HeatTransferModes` viz (전도/대류/복사 3종 토글 애니메이션)
-- [ ] **비열 (specific-heat)** — `SpecificHeatRace` viz (같은 질량 두 물질 동시 가열, 온도 상승 속도 비교)
-- [ ] **열팽창 (thermal-expansion)** — `BimetalStrip` viz (바이메탈 휨 애니메이션)
+- [x] **비열 (specific-heat)** — `SpecificHeatRace` viz (4종 물질 동시 가열, RAF 기반 온도계+그래프 동기화)
+- [x] **열팽창 (thermal-expansion)** — `BimetalStrip` viz (온도 슬라이더로 바이메탈 휨 + 이상 팽창 본문)
 
-### Sprint 4 (다음 단원 후보)
-- [ ] 중2 전기와 자기 (`Circuit`, `MagneticField`)
-- [ ] 중2 태양계 (`OrbitSimulator`)
-- [ ] 중2 식물/동물과 에너지
+### Sprint 4 (완료, 2026-05-26) — 중2 과학 신규 4단원
+- [x] **전기와 자기 (`electricity-and-magnetism`)** — 5개념: static-electricity / electric-current / ohms-law / magnetic-field / electromagnetic-induction
+  - viz: `StaticElectricityViz`, `CircuitDiagram`, `OhmsLawGraph`, `MagneticFieldViz`, `ElectromagneticInduction`
+- [x] **태양계 (`solar-system`)** — 4개념: earth-and-moon-motion / lunar-phases / planets / sun-and-energy
+  - viz: `EarthMoonOrbit`(RAF 공전·자전), `LunarPhases`(8위상), `PlanetComparison`(크기/거리 토글), `SunLayers`(흑점·홍염)
+- [x] **식물과 에너지 (`plants-and-energy`)** — 3개념: photosynthesis / respiration-plant / transpiration
+  - viz: `PhotosynthesisDiagram`, `PlantRespirationCycle`(낮/밤 토글), `TranspirationViz`(기공 개폐)
+- [x] **동물과 에너지 (`animals-and-energy`)** — 4개념: digestion / circulation / respiration-animal / excretion
+  - viz: `DigestionTract`(6단계 토글), `CirculationLoop`(체·폐순환), `RespirationLungs`(들숨·날숨), `ExcretionKidney`(여과·재흡수·분비)
+- [x] `lib/catalog.ts`에 4개 단원 메타 일괄 등록 (objectives 3개씩)
+- [x] `components/MdxContent.tsx`에 신규 17개 viz import + 매핑 등록
+- [ ] (대기) Vercel preview deploy로 빌드 검증
 
-### Sprint 4+ (확장)
-- [ ] 중1, 중3 과학
-- [ ] 사회/역사 도입 (Timeline, Map 컴포넌트 추가)
+### Sprint 5 (Phase 2 prerequisite + 수학)
+- [ ] §8 라우트 일반화 — `app/[subject]/...` 동적 세그먼트, 기존 `/science/...` 회귀 없도록
+- [ ] 중2 수학 10단원 — 유리수와 순환소수, 식의 계산, 일차부등식, 연립일차방정식, 일차함수, 삼각형·사각형 성질, 도형의 닮음, 피타고라스, 확률
+
+### Sprint 6+ (Phase 3 / 확장)
+- [ ] 사회·역사 — `Timeline`, `MapHighlight` 공통 viz 인프라
+- [ ] 중2 사회 7단원, 중2 역사 7단원
+- [ ] 중1, 중3 과학 확장
 
 ---
 
-## 현재 컨텐츠 인벤토리 (2026-05-26)
+## 현재 컨텐츠 인벤토리 (2026-05-26, Phase 1 종료 시점)
+
+**합계 — 6단원 / 29개념 / 30개 viz 컴포넌트**
 
 | 단원 | 개념 | order | 시각화 컴포넌트 |
 |---|---|---|---|
@@ -208,6 +223,26 @@ import HeatingCurve from "@/components/viz/HeatingCurve";
 | 물질의 특성 | 크로마토그래피 | 8 | ChromatographyViz |
 | 열과 우리 생활 | 온도와 열 | 1 | ParticleMotion |
 | 열과 우리 생활 | 열의 이동 | 2 | HeatTransferModes |
+| 열과 우리 생활 | 비열 | 3 | SpecificHeatRace |
+| 열과 우리 생활 | 열팽창 | 4 | BimetalStrip |
+| 전기와 자기 | 마찰 전기와 정전기 | 1 | StaticElectricityViz |
+| 전기와 자기 | 전류와 회로 | 2 | CircuitDiagram |
+| 전기와 자기 | 옴의 법칙 | 3 | OhmsLawGraph |
+| 전기와 자기 | 자기장 | 4 | MagneticFieldViz |
+| 전기와 자기 | 전자기 유도 | 5 | ElectromagneticInduction |
+| 태양계 | 지구와 달의 운동 | 1 | EarthMoonOrbit |
+| 태양계 | 달의 위상 | 2 | LunarPhases |
+| 태양계 | 태양계 행성 | 3 | PlanetComparison |
+| 태양계 | 태양과 에너지 | 4 | SunLayers |
+| 식물과 에너지 | 광합성 | 1 | PhotosynthesisDiagram |
+| 식물과 에너지 | 식물의 호흡 | 2 | PlantRespirationCycle |
+| 식물과 에너지 | 증산 작용 | 3 | TranspirationViz |
+| 동물과 에너지 | 소화 | 1 | DigestionTract |
+| 동물과 에너지 | 순환 | 2 | CirculationLoop |
+| 동물과 에너지 | 호흡 | 3 | RespirationLungs |
+| 동물과 에너지 | 배설 | 4 | ExcretionKidney |
+
+**Phase 1 (이번 작업)에서 추가**: 18 개념 + 17 viz 컴포넌트 (heat 잔여 2 + 신규 4단원 16).
 
 ---
 
@@ -250,10 +285,11 @@ import HeatingCurve from "@/components/viz/HeatingCurve";
 - [ ] MDX 내 JSX `<table className=...>` 렌더 결과 (next-mdx-remote@6 RSC)
 - [ ] 모바일 디바이스 실기기 확인
 
-### 다음 권장 액션
-1. 배포 URL 직접 열어 핵심 동작 빠르게 확인 (위 체크리스트)
-2. 정적 코드 리뷰 (superpowers `requesting-code-review`) — 빌드는 통과해도 잡힐 수 있는 버그 찾기
-3. 비열·열팽창 viz 작성으로 "열과 우리 생활" 단원 완성
+### 다음 권장 액션 (Phase 1 종료 후 — 2026-05-26 갱신)
+1. **사용자 직접 실행 필요**: 프로젝트 폴더에서 `vercel`(preview) — Phase 1에서 추가된 18개념·17 viz·카탈로그 4단원이 한 번에 빌드되는지 확인. 로그에서 `✓ Compiled successfully` + 정적 페이지 생성 실패 0 확인.
+2. preview URL에서 새 4단원 각각 1개 개념씩 직접 열어 viz 렌더·인터랙션 회귀 없는지 확인 — 우선 점검 viz: `EarthMoonOrbit`(RAF 루프), `CircuitDiagram`(SMIL offset 애니), `PhotosynthesisDiagram`(빛 슬라이더), `CirculationLoop`(animateMotion)
+3. Phase 2 진입 결정 — `/goal phase2` 또는 `/goal route` 로 Sprint 5 시작 (수학 + 라우트 일반화)
+4. Phase 1 viz는 빠르게 만든 만큼 후속 폴리시 여지 — 코드 리뷰 1회 권장 (`superpowers:requesting-code-review`)
 
 ### 정직 선언 업데이트
 > 빌드·배포는 사용자 확인으로 통과. 단 **실제 인터랙션 동작**(RAF 루프·SMIL·드로어 등)은 브라우저 수동 확인 또는 e2e 테스트 전까지는 "동작 확인됨"이라 단정하지 않음.
@@ -297,5 +333,29 @@ import HeatingCurve from "@/components/viz/HeatingCurve";
 > "학생 사용자 입장에서 보면 잘 돌아가 보이는 빌드. 단 viz 레이어가 약점이고, RAF + 상태 상호작용(`ParticleMotion`)과 `DensityTank.findRestY`의 경계 조건이 가장 위험. `SiteMenu`의 a11y/iOS 갭은 실제 문제지만 치명적이지는 않음." — reviewer subagent
 
 ### 후속 조치 상태
-- 🔴 must-fix 3건 — **완료 (2026-05-26)**. 단 코드 변경 후 빌드 재검증은 아직 수행하지 않음. 다음 `vercel` 또는 `/goal` 실행 시 자동으로 검증됨.
+- 🔴 must-fix 3건 — **완료 (2026-05-26)**. 단 코드 변경 후 빌드 재검증은 아직 수행하지 않음. **Phase 1 종료 시점의 `vercel` preview에서 함께 검증 예정.**
 - 🟡 defer-OK 항목 (SiteMenu 포커스 트랩·iOS scroll lock, HeatTransferModes defs 정리, HeatingCurve eslint-disable, SolubilityCurve `<text>` transition, niceTicks 음수 범위) — 미처리. 추후 별도 그루밍 권장.
+
+---
+
+## 13. Phase 1 종료 보고 (2026-05-26)
+
+### 작업 요약
+`/goal` (인자 없음) — goal.md §5 Phase 1 (과학 완성) 범위 실행. 6번째 단원까지 메타·콘텐츠·viz 모두 완성.
+
+### 추가된 항목
+- 단원 4개 신규 등록 (`lib/catalog.ts`): electricity-and-magnetism, solar-system, plants-and-energy, animals-and-energy — 각 objectives 3개
+- MDX 18개 (heat-and-life 잔여 2 + 신규 4단원 16)
+- viz 컴포넌트 17개 (heat-and-life 2 + 신규 4단원 15; CircuitDiagram 등 일부는 단원 내 공유 가능)
+- `components/MdxContent.tsx` 매핑 등록 일괄 갱신
+
+### 작성 방식
+메인이 카탈로그·MdxContent 일괄 처리 → Sprint 3 잔여(비열·열팽창)는 메인 직접 작성 → 4개 신규 단원은 `general-purpose` 서브에이전트 4개 병렬 dispatch → 완료 후 LaTeX `$$` 표기를 일반 텍스트로 정리(remark-math 미도입).
+
+### 검증 상태
+- 로컬 `npm install` — Google Drive 환경 차단 (변경 없음)
+- Vercel preview deploy — **사용자 실행 대기 (next action)**
+- 코드 리뷰 — 후속 권장
+
+### 다음 Phase 진입 승인 요청
+사용자가 Vercel preview 결과를 확인하고 회귀 없음을 확인하면 → `/goal phase2` 호출로 Sprint 5 시작 (라우트 일반화 + 수학 10단원). 본 Phase 작업물 회귀가 발견되면 같은 Phase 내에서 디버깅 후 다시 보고.
