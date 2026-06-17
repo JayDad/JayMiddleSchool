@@ -57,7 +57,14 @@ export default function ConceptPage({
 
       <TestPoints points={concept.testPoints} />
 
-      <SelfCheck quiz={concept.quiz} />
+      <SelfCheck
+        quiz={concept.quiz}
+        subject="science"
+        unit={unit.slug}
+        unitTitle={unit.title}
+        concept={concept.slug}
+        conceptTitle={concept.title}
+      />
 
       <nav className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 gap-3">
         {prev ? (
